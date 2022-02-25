@@ -17,7 +17,6 @@
                 password = Environment.GetEnvironmentVariable("FSTR_DB_PASS", EnvironmentVariableTarget.Machine);
             }
 
-
             return $"Host={host};Port={port};Database=FSTR_DB;Username={login};Password={password}";
         }
     }

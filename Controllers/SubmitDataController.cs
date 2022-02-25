@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using FstrApi.Structures;
 
 namespace FstrApi.Controllers
 {
@@ -6,11 +7,16 @@ namespace FstrApi.Controllers
     [Route("[controller]")]
     public class SubmitDataController : Controller
     {
+        /// <summary>
+        /// Добавление нового маршрута
+        /// </summary>
+        /// <param name="pereval">Набор информации о маршруте</param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public IActionResult AddNewData([FromBody] Structures.Pereval pereval)
+        public IActionResult AddNewData([FromBody] Pereval pereval)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Заполнены не все поля!");
@@ -22,6 +28,9 @@ namespace FstrApi.Controllers
                 && string.IsNullOrEmpty(pereval.level.spring))
                 || pereval.images.Count == 0)
                 return BadRequest("Заполнены не все поля!");
+
+            ImagesController imagesController = new ImagesController();
+            imagesController.LoadImages(pereval.images);
 
             return Ok(pereval);
         }
