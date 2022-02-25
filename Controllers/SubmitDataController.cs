@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using FstrApi.Structures;
+using FstrApi.Models;
 
 namespace FstrApi.Controllers
 {
@@ -29,8 +30,19 @@ namespace FstrApi.Controllers
                 || pereval.images.Count == 0)
                 return BadRequest("Заполнены не все поля!");
 
-            //ImagesController imagesController = new ImagesController();
-            //var imagesIds = imagesController.LoadImages(pereval.images).Result;
+            ImagesController imagesController = new ImagesController();
+            var imagesIds = imagesController.LoadImages(pereval.images).Result;
+
+            RouteController routeController = new RouteController();
+            var newRouteResult = await routeController.SaveNewRoute(pereval, imagesIds/*new List<int>()*/);
+
+            var badRequestResult = newRouteResult as BadRequestObjectResult;
+            if (badRequestResult != null)
+                return BadRequest(badRequestResult.Value?.ToString());
+
+            var okRequestResult = newRouteResult as OkObjectResult;
+            if (okRequestResult != null)
+                return Ok(okRequestResult.Value?.ToString());
 
             return Ok(pereval);
         }
