@@ -9,5 +9,6 @@ namespace FstrApi.Models
         public DateTime? DateAdded { get; set; }
         public string? RawData { get; set; }
         public string? Images { get; set; }
+        public string? Status { get; set; }
     }
 }

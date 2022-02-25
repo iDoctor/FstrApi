@@ -51,6 +51,10 @@ namespace FstrApi.Models
                 entity.Property(e => e.RawData)
                     .HasColumnType("json")
                     .HasColumnName("raw_data");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                    .HasColumnName("status");
             });
 
             modelBuilder.Entity<PerevalArea>(entity =>
