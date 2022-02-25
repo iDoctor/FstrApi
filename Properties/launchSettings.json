@@ -14,7 +14,11 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "FSTR_DB_HOST": "localhost",
+        "FSTR_DB_PORT": "5432",
+        "FSTR_DB_LOGIN": "postovski",
+        "FSTR_DB_PASS": "12345"
       },
       "applicationUrl": "http://localhost:5116",
       "dotnetRunMessages": true
