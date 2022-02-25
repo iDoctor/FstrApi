@@ -16,7 +16,7 @@ namespace FstrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public IActionResult AddNewData([FromBody] Pereval pereval)
+        public async Task<IActionResult> AddNewData([FromBody] Pereval pereval)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Заполнены не все поля!");
@@ -29,8 +29,8 @@ namespace FstrApi.Controllers
                 || pereval.images.Count == 0)
                 return BadRequest("Заполнены не все поля!");
 
-            ImagesController imagesController = new ImagesController();
-            imagesController.LoadImages(pereval.images);
+            //ImagesController imagesController = new ImagesController();
+            //var imagesIds = imagesController.LoadImages(pereval.images).Result;
 
             return Ok(pereval);
         }
