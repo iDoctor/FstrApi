@@ -17,6 +17,7 @@ namespace FstrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [Produces("application/json")]
         public async Task<IActionResult> AddNewData([FromBody] Pereval pereval)
         {
             if (!ModelState.IsValid)
@@ -58,6 +59,7 @@ namespace FstrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [Produces("application/json")]
         public async Task<IActionResult> GetAllData([FromBody] User user)
         {
             if (!ModelState.IsValid)
