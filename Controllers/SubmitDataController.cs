@@ -14,10 +14,9 @@ namespace FstrApi.Controllers
         /// <param name="pereval">Набор информации о маршруте</param>
         /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        [Produces("application/json")]
         public async Task<IActionResult> AddNewData([FromBody] Pereval pereval)
         {
             if (!ModelState.IsValid)
@@ -56,10 +55,10 @@ namespace FstrApi.Controllers
         /// <param name="user">Набор информации о пользователе</param>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(List<PerevalAdded>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        [Produces("application/json")]
+        //[Produces("application/json", "text/plain")]
         public async Task<IActionResult> GetAllData([FromBody] User user)
         {
             if (!ModelState.IsValid)
@@ -86,10 +85,10 @@ namespace FstrApi.Controllers
         /// </summary>
         /// <param name="id">id маршрута</param>
         /// <returns></returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(PerevalAdded), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetDataById(int id)
         {
             RouteController routeController = new RouteController();
@@ -113,10 +112,10 @@ namespace FstrApi.Controllers
         /// </summary>
         /// <param name="id">id маршрута</param>
         /// <returns></returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         [HttpGet("{id}/status")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> GetStatus(int id)
         {
             RouteController routeController = new RouteController();
@@ -140,10 +139,10 @@ namespace FstrApi.Controllers
         /// </summary>
         /// <param name="id">id маршрута</param>
         /// <returns></returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(PerevalAdded), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<IActionResult> EditData(int id)
         {
             RouteController routeController = new RouteController();
