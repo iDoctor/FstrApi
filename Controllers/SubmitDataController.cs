@@ -42,9 +42,122 @@ namespace FstrApi.Controllers
 
             var okRequestResult = newRouteResult as OkObjectResult;
             if (okRequestResult != null)
-                return Ok(okRequestResult.Value?.ToString());
+            {
+                return okRequestResult.Value == null ? BadRequest("Отсутствуют данные!") : Ok(okRequestResult.Value.ToString());
+            }
 
-            return Ok(pereval);
+            return BadRequest("Запрос выполнен некорректно!");
+        }
+
+        /// <summary>
+        /// Вывод информации о всех маршрутах (для пользователя??)
+        /// </summary>
+        /// <param name="user">Набор информации о пользователе</param>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        public async Task<IActionResult> GetAllData([FromBody] User user)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Заполнены не все поля!");
+
+            RouteController routeController = new RouteController();
+            var allRoutesResult = await routeController.GetAllRoutes(user);
+
+            var badRequestResult = allRoutesResult as BadRequestObjectResult;
+            if (badRequestResult != null)
+                return BadRequest(badRequestResult.Value?.ToString());
+
+            var okRequestResult = allRoutesResult as OkObjectResult;
+            if (okRequestResult != null)
+            {
+                return okRequestResult.Value == null ? BadRequest("Отсутствуют данные!") : Ok(okRequestResult.Value as List<PerevalAdded>);
+            }
+            
+            return BadRequest("Запрос выполнен некорректно!");
+        }
+
+        /// <summary>
+        /// Вывод информации о маршруте по его ID
+        /// </summary>
+        /// <param name="id">id маршрута</param>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDataById(int id)
+        {
+            RouteController routeController = new RouteController();
+            var routeResult = await routeController.GetRouteById(id);
+
+            var badRequestResult = routeResult as BadRequestObjectResult;
+            if (badRequestResult != null)
+                return BadRequest(badRequestResult.Value?.ToString());
+
+            var okRequestResult = routeResult as OkObjectResult;
+            if (okRequestResult != null)
+            {
+                return okRequestResult.Value == null ? BadRequest("Отсутствуют данные!") : Ok(okRequestResult.Value as PerevalAdded);
+            }
+
+            return BadRequest("Запрос выполнен некорректно!");
+        }
+
+        /// <summary>
+        /// Вывод статуса маршрута по его ID
+        /// </summary>
+        /// <param name="id">id маршрута</param>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [HttpGet("{id}/status")]
+        public async Task<IActionResult> GetStatus(int id)
+        {
+            RouteController routeController = new RouteController();
+            var routeResult = await routeController.GetRouteStatus(id);
+
+            var badRequestResult = routeResult as BadRequestObjectResult;
+            if (badRequestResult != null)
+                return BadRequest(badRequestResult.Value?.ToString());
+
+            var okRequestResult = routeResult as OkObjectResult;
+            if (okRequestResult != null)
+            {
+                return okRequestResult.Value == null ? BadRequest("Отсутствуют данные!") : Ok(okRequestResult.Value.ToString());
+            }
+
+            return BadRequest("Запрос выполнен некорректно!");
+        }
+
+        /// <summary>
+        /// Редактирование маршрута
+        /// </summary>
+        /// <param name="id">id маршрута</param>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditData(int id)
+        {
+            RouteController routeController = new RouteController();
+            var routeResult = await routeController.EditRoute(id);
+
+            var badRequestResult = routeResult as BadRequestObjectResult;
+            if (badRequestResult != null)
+                return BadRequest(badRequestResult.Value?.ToString());
+
+            var okRequestResult = routeResult as OkObjectResult;
+            if (okRequestResult != null)
+            {
+                return okRequestResult.Value == null ? BadRequest("Отсутствуют данные!") : Ok(okRequestResult.Value as PerevalAdded);
+            }
+
+            return BadRequest("Запрос выполнен некорректно!");
         }
     }
 }
