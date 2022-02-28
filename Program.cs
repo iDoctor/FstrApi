@@ -8,7 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
     c =>
     {
-        c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "FstrApi - Документация", Version = "v1" });
+        c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "FstrApi - Documentation", Version = "v1" });
         c.IncludeXmlComments(Path.Combine(System.AppContext.BaseDirectory, "FstrApi.xml"));
     });
 
