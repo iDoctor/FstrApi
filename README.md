@@ -22,4 +22,7 @@ docker run --name fstrapi -e FSTR_DB_HOST=192.168.1.3 -e FSTR_DB_PORT=4321 -e FS
 - POST /submitData	-	Добавление информации о новом маршруте
 
 #### MVP2
--
+- GET /submitData	-	Получение всех маршрутов пользователя
+- GET /submitData/{id}	-	Получение маршрута пользователя по id
+- GET /submitData/{id}/status	-	Получение статуса маршрута пользователя по id
+- PUT /submitData/{id}	-	Изменение данных маршрута
