@@ -29,6 +29,19 @@ namespace FstrApi.Controllers
                 && string.IsNullOrEmpty(pereval.level.spring))
                 || pereval.images.Count == 0)
                 return BadRequest("Заполнены не все поля!");
+            
+            var validation = new Validation();
+            string email = validation.ValidateEmail(pereval.user.email);
+            string phone = validation.ValidatePhone(pereval.user.phone);
+
+            // TODO: Уточнить какие поля являются обязательными!
+            if (!string.IsNullOrEmpty(pereval.user.email) && string.IsNullOrEmpty(email))
+                return BadRequest("Некорректный формат email!");
+            if (!string.IsNullOrEmpty(pereval.user.phone) && string.IsNullOrEmpty(phone))
+                return BadRequest("Некорректный формат phone!");
+
+            pereval.user.email = email;
+            pereval.user.phone = phone;
 
             ImagesController imagesController = new ImagesController();
             var imagesIds = imagesController.LoadImages(pereval.images).Result;
@@ -59,10 +72,23 @@ namespace FstrApi.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         //[Produces("application/json", "text/plain")]
+        // WARNING!
+        // Используется метод GET с параметрами в Body
+        // Однако, передавать данные в Json через переменную тоже такое себе...
+        // TODO: уточнить ТЗ
         public async Task<IActionResult> GetAllData([FromBody] User user)
         {
-            if (!ModelState.IsValid)
-                return BadRequest("Заполнены не все поля!");
+            var validation = new Validation();
+            string email = validation.ValidateEmail(user.email);
+            string phone = validation.ValidatePhone(user.phone);
+
+            if (!string.IsNullOrEmpty(user.email) && string.IsNullOrEmpty(email))
+                return BadRequest("Некорректный формат email!");
+            if (!string.IsNullOrEmpty(user.phone) && string.IsNullOrEmpty(phone))
+                return BadRequest("Некорректный формат phone!");
+
+            user.email = email;
+            user.phone = phone;
 
             RouteController routeController = new RouteController();
             var allRoutesResult = await routeController.GetAllRoutes(user);
