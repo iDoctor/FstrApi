@@ -8,7 +8,7 @@ namespace FstrApi.Controllers
 {
     public class RouteController : Controller
     {
-        public async Task<IActionResult> SaveNewRoute(Pereval pereval, List<int> imagesIds)
+        public async Task<IActionResult> SaveNewRoute(Pereval pereval, LoadedImage images)
         {
             try
             {
@@ -21,7 +21,7 @@ namespace FstrApi.Controllers
                     {
                         DateAdded = addedDt,
                         RawData = JsonConvert.SerializeObject(pereval, Formatting.Indented),
-                        Images = "{}",  //TODO: imagesIds (convert to json) - Уточнить ТЗ!                                  
+                        Images = JsonConvert.SerializeObject(images, Formatting.Indented),
                         Status = "new"
                     };
 

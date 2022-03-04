@@ -46,10 +46,10 @@ namespace FstrApi.Controllers
             pereval.user.phone = phone;
 
             ImagesController imagesController = new ImagesController();
-            var imagesIds = imagesController.LoadImages(pereval.images).Result;
+            var images = await imagesController.LoadImages(pereval.images);
 
             RouteController routeController = new RouteController();
-            var newRouteResult = await routeController.SaveNewRoute(pereval, imagesIds/*new List<int>()*/);
+            var newRouteResult = await routeController.SaveNewRoute(pereval, images);
 
             var badRequestResult = newRouteResult as BadRequestObjectResult;
             if (badRequestResult != null)
