@@ -39,6 +39,8 @@ namespace FstrApi.Controllers
                 return BadRequest("Некорректный формат email!");
             if (!string.IsNullOrEmpty(pereval.user.phone) && string.IsNullOrEmpty(phone))
                 return BadRequest("Некорректный формат phone!");
+            if (string.IsNullOrEmpty(pereval.user.fam) || string.IsNullOrEmpty(pereval.user.name) || string.IsNullOrEmpty(pereval.user.otc))
+                return BadRequest("Не заполнены поля ФИО!");
 
             pereval.user.email = email;
             pereval.user.phone = phone;
