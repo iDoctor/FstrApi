@@ -8,17 +8,20 @@ namespace FstrApi.Controllers
 {
     public class RouteController : Controller
     {
-        public async Task<IActionResult> SaveNewRoute(Pereval pereval, List<int> imagesIds)
+        public async Task<IActionResult> SaveNewRoute(Pereval pereval, LoadedImage images)
         {
             try
             {
+                DateTime addedDt;
+                addedDt = DateTime.TryParse(pereval.add_time, out addedDt) ? addedDt : DateTime.Now;
+
                 await using (FSTR_DBContext fstr = new FSTR_DBContext())
                 {
                     var newRoute = new PerevalAdded
                     {
-                        DateAdded = DateTime.Now,
-                        RawData = JsonConvert.SerializeObject(pereval),
-                        Images = "{}",  //imagesIds (convert to json)
+                        DateAdded = addedDt,
+                        RawData = JsonConvert.SerializeObject(pereval, Formatting.Indented),
+                        Images = JsonConvert.SerializeObject(images, Formatting.Indented),
                         Status = "new"
                     };
 
@@ -41,8 +44,12 @@ namespace FstrApi.Controllers
             {
                 await using (FSTR_DBContext fstr = new FSTR_DBContext())
                 {
-                    // TODO: Некорректная постановка задачи. Данные по пользователю хранятся в БД только в Json!
-                    var routesList = await fstr.PerevalAddeds.Where(x => x.Id > 0).ToListAsync();
+                    List<PerevalAdded> routesList = fstr.PerevalAddeds.FromSqlRaw($"SELECT * FROM pereval_added WHERE id > 0" +
+                            (!string.IsNullOrEmpty(user.email) ? $" AND raw_data->'user'->>'email' = '{user.email}'" : string.Empty) +
+                            (!string.IsNullOrEmpty(user.phone) ? $" AND raw_data->'user'->>'phone' = '{user.phone}'" : string.Empty) +
+                            (!string.IsNullOrEmpty(user.fam) ? $" AND raw_data->'user'->>'fam' = '{user.fam}'" : string.Empty) +
+                            (!string.IsNullOrEmpty(user.name) ? $" AND raw_data->'user'->>'name' = '{user.name}'" : string.Empty) +
+                            (!string.IsNullOrEmpty(user.otc) ? $" AND raw_data->'user'->>'otc' = '{user.otc}'" : string.Empty)).ToList();
 
                     return Ok(routesList);
                 }
@@ -87,8 +94,24 @@ namespace FstrApi.Controllers
             }
         }
 
-        // TODO: Необходимо дополнительно передавать объект Pereval!
-        public async Task<IActionResult> EditRoute(int id)
+        public async Task<IActionResult> FindRoute(int id)
+        {
+            try
+            {
+                await using (FSTR_DBContext fstr = new FSTR_DBContext())
+                {
+                    var route = await fstr.PerevalAddeds.Where(x => x.Id == id && x.Status == "new").Select(x => x.Id).FirstOrDefaultAsync();
+
+                    return Ok(route);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message + Environment.NewLine + ex.InnerException?.Message);
+            }
+        }
+
+        public async Task<IActionResult> EditRoute(int id, Pereval pereval, LoadedImage images)
         {
             try
             {
@@ -96,9 +119,16 @@ namespace FstrApi.Controllers
                 {
                     var route = await fstr.PerevalAddeds.FirstOrDefaultAsync(x => x.Id == id);
 
-                    if (route != null && route.Status == "new")
+                    if (route != null)
                     {
-                        // Редактируем запись
+                        DateTime addedDt;
+                        addedDt = DateTime.TryParse(pereval.add_time, out addedDt) ? addedDt : DateTime.Now;
+
+                        route.DateAdded = addedDt;
+                        route.RawData = JsonConvert.SerializeObject(pereval, Formatting.Indented);
+                        route.Images = JsonConvert.SerializeObject(images, Formatting.Indented);
+
+                        fstr.SaveChanges();
                     }
 
                     return Ok(route);

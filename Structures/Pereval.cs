@@ -52,15 +52,15 @@ namespace FstrApi.Structures
     public class User
     {
         public string id { get; set; }
-        [Required]
+        //[Required]
         public string email { get; set; }
-        [Required]
+        //[Required]
         public string phone { get; set; }
-        [Required]
+        //[Required]
         public string fam { get; set; }
-        [Required]
+        //[Required]
         public string name { get; set; }
-        [Required]
+        //[Required]
         public string otc { get; set; }
     }
 }

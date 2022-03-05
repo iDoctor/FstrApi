@@ -29,12 +29,27 @@ namespace FstrApi.Controllers
                 && string.IsNullOrEmpty(pereval.level.spring))
                 || pereval.images.Count == 0)
                 return BadRequest("Заполнены не все поля!");
+            
+            var validation = new Validation();
+            string email = validation.ValidateEmail(pereval.user.email);
+            string phone = validation.ValidatePhone(pereval.user.phone);
+
+            // TODO: Уточнить какие поля являются обязательными!
+            if (!string.IsNullOrEmpty(pereval.user.email) && string.IsNullOrEmpty(email))
+                return BadRequest("Некорректный формат email!");
+            if (!string.IsNullOrEmpty(pereval.user.phone) && string.IsNullOrEmpty(phone))
+                return BadRequest("Некорректный формат phone!");
+            if (string.IsNullOrEmpty(pereval.user.fam) || string.IsNullOrEmpty(pereval.user.name) || string.IsNullOrEmpty(pereval.user.otc))
+                return BadRequest("Не заполнены поля ФИО!");
+
+            pereval.user.email = email;
+            pereval.user.phone = phone;
 
             ImagesController imagesController = new ImagesController();
-            var imagesIds = imagesController.LoadImages(pereval.images).Result;
+            var images = await imagesController.LoadImages(pereval.images);
 
             RouteController routeController = new RouteController();
-            var newRouteResult = await routeController.SaveNewRoute(pereval, imagesIds/*new List<int>()*/);
+            var newRouteResult = await routeController.SaveNewRoute(pereval, images);
 
             var badRequestResult = newRouteResult as BadRequestObjectResult;
             if (badRequestResult != null)
@@ -59,10 +74,23 @@ namespace FstrApi.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         //[Produces("application/json", "text/plain")]
+        // WARNING!
+        // Используется метод GET с параметрами в Body
+        // Однако, передавать данные в Json через переменную тоже такое себе...
+        // TODO: уточнить ТЗ
         public async Task<IActionResult> GetAllData([FromBody] User user)
         {
-            if (!ModelState.IsValid)
-                return BadRequest("Заполнены не все поля!");
+            var validation = new Validation();
+            string email = validation.ValidateEmail(user.email);
+            string phone = validation.ValidatePhone(user.phone);
+
+            if (!string.IsNullOrEmpty(user.email) && string.IsNullOrEmpty(email))
+                return BadRequest("Некорректный формат email!");
+            if (!string.IsNullOrEmpty(user.phone) && string.IsNullOrEmpty(phone))
+                return BadRequest("Некорректный формат phone!");
+
+            user.email = email;
+            user.phone = phone;
 
             RouteController routeController = new RouteController();
             var allRoutesResult = await routeController.GetAllRoutes(user);
@@ -138,24 +166,42 @@ namespace FstrApi.Controllers
         /// Редактирование маршрута
         /// </summary>
         /// <param name="id">id маршрута</param>
+        /// <param name="pereval">Новая информация о маршруте</param>
         /// <returns></returns>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(PerevalAdded), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<IActionResult> EditData(int id)
+        // WARNING!
+        // Используется метод PUT с параметрами в запросе и в Body
+        // Согласен, некрасиво. Но пока что нашёл только такое решение :)
+        // TODO: уточнить ТЗ
+        public async Task<IActionResult> EditData(int id, [FromBody] Pereval pereval)
         {
             RouteController routeController = new RouteController();
-            var routeResult = await routeController.EditRoute(id);
+            var routeResult = await routeController.FindRoute(id);
 
-            var badRequestResult = routeResult as BadRequestObjectResult;
-            if (badRequestResult != null)
-                return BadRequest(badRequestResult.Value?.ToString());
+            var badRouteRequestResult = routeResult as BadRequestObjectResult;
+            if (badRouteRequestResult != null)
+                return BadRequest(badRouteRequestResult.Value?.ToString());
 
-            var okRequestResult = routeResult as OkObjectResult;
-            if (okRequestResult != null)
+            var okRouteRequestResult = routeResult as OkObjectResult;
+            if (okRouteRequestResult != null)
             {
-                return okRequestResult.Value == null ? BadRequest("Отсутствуют данные!") : Ok(okRequestResult.Value as PerevalAdded);
+                ImagesController imagesController = new ImagesController();
+                var images = await imagesController.LoadImages(pereval.images);
+
+                var editRouteResult = await routeController.EditRoute(id, pereval, images);
+
+                var badEditRequestResult = editRouteResult as BadRequestObjectResult;
+                if (badEditRequestResult != null)
+                    return BadRequest(badEditRequestResult.Value?.ToString());
+
+                var okEditRequestResult = editRouteResult as OkObjectResult;
+                if (okEditRequestResult != null)
+                {
+                    return okEditRequestResult.Value == null ? BadRequest("Отсутствуют данные!") : Ok(okEditRequestResult.Value as PerevalAdded);
+                }
             }
 
             return BadRequest("Запрос выполнен некорректно!");
