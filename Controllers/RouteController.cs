@@ -94,8 +94,24 @@ namespace FstrApi.Controllers
             }
         }
 
-        // TODO: Необходимо дополнительно передавать объект Pereval! (какой формат??)
-        public async Task<IActionResult> EditRoute(int id)
+        public async Task<IActionResult> FindRoute(int id)
+        {
+            try
+            {
+                await using (FSTR_DBContext fstr = new FSTR_DBContext())
+                {
+                    var route = await fstr.PerevalAddeds.Where(x => x.Id == id && x.Status == "new").Select(x => x.Id).FirstOrDefaultAsync();
+
+                    return Ok(route);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message + Environment.NewLine + ex.InnerException?.Message);
+            }
+        }
+
+        public async Task<IActionResult> EditRoute(int id, Pereval pereval, LoadedImage images)
         {
             try
             {
@@ -103,9 +119,16 @@ namespace FstrApi.Controllers
                 {
                     var route = await fstr.PerevalAddeds.FirstOrDefaultAsync(x => x.Id == id);
 
-                    if (route != null && route.Status == "new")
+                    if (route != null)
                     {
-                        // Редактируем запись
+                        DateTime addedDt;
+                        addedDt = DateTime.TryParse(pereval.add_time, out addedDt) ? addedDt : DateTime.Now;
+
+                        route.DateAdded = addedDt;
+                        route.RawData = JsonConvert.SerializeObject(pereval, Formatting.Indented);
+                        route.RawData = JsonConvert.SerializeObject(images, Formatting.Indented);
+
+                        fstr.SaveChanges();
                     }
 
                     return Ok(route);
