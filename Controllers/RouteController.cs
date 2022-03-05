@@ -126,7 +126,7 @@ namespace FstrApi.Controllers
 
                         route.DateAdded = addedDt;
                         route.RawData = JsonConvert.SerializeObject(pereval, Formatting.Indented);
-                        route.RawData = JsonConvert.SerializeObject(images, Formatting.Indented);
+                        route.Images = JsonConvert.SerializeObject(images, Formatting.Indented);
 
                         fstr.SaveChanges();
                     }
